@@ -1,20 +1,11 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import fs from 'fs';
-import path from 'path';
 import dotenv from 'dotenv';
 import { Request, Response, NextFunction } from 'express';
+import { pool, initDb } from './db';
 
 // Load environment variables from .env file
 dotenv.config();
-
-const DATA_DIR = path.join(process.cwd(), 'server', 'data');
-const CREDENTIALS_FILE = path.join(DATA_DIR, 'credentials.json');
-
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
 
 // Strictly require JWT_SECRET from environment variables — no hardcoded fallbacks
 const rawJwtSecret = process.env.JWT_SECRET?.trim();
@@ -46,43 +37,54 @@ const loginAttempts = new Map<string, AttemptRecord>();
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
-export function getAdminCredentials(): StoredCredentials {
-  if (fs.existsSync(CREDENTIALS_FILE)) {
-    try {
-      const data = JSON.parse(fs.readFileSync(CREDENTIALS_FILE, 'utf-8'));
-      if (data.username && data.passwordHash) {
-        return data;
-      }
-    } catch (e) {
-      console.error('Error reading credentials file, resetting to default:', e);
-    }
+export async function getAdminCredentials(): Promise<StoredCredentials> {
+  await initDb();
+
+  const result = await pool.query(
+    'SELECT username, password_hash, updated_at FROM admin_credentials WHERE id = 1'
+  );
+
+  if (result.rows.length > 0) {
+    const row = result.rows[0];
+    return {
+      username: row.username,
+      passwordHash: row.password_hash,
+      updatedAt: row.updated_at
+    };
   }
 
-  // Hash default password with bcrypt
+  // Seed default admin credentials on first run
   const salt = bcrypt.genSaltSync(10);
   const passwordHash = bcrypt.hashSync(DEFAULT_PASSWORD, salt);
-  const credentials: StoredCredentials = {
+
+  await pool.query(
+    `INSERT INTO admin_credentials (id, username, password_hash, updated_at)
+     VALUES (1, $1, $2, now())
+     ON CONFLICT (id) DO NOTHING`,
+    [DEFAULT_USERNAME, passwordHash]
+  );
+
+  return {
     username: DEFAULT_USERNAME,
     passwordHash,
     updatedAt: new Date().toISOString()
   };
-
-  fs.writeFileSync(CREDENTIALS_FILE, JSON.stringify(credentials, null, 2), 'utf-8');
-  return credentials;
 }
 
-export function updateAdminPassword(newPassword: string, newUsername?: string): boolean {
+export async function updateAdminPassword(newPassword: string, newUsername?: string): Promise<boolean> {
+  await initDb();
+
   const salt = bcrypt.genSaltSync(10);
   const passwordHash = bcrypt.hashSync(newPassword, salt);
-  const current = getAdminCredentials();
-  
-  const updated: StoredCredentials = {
-    username: newUsername || current.username,
-    passwordHash,
-    updatedAt: new Date().toISOString()
-  };
+  const current = await getAdminCredentials();
 
-  fs.writeFileSync(CREDENTIALS_FILE, JSON.stringify(updated, null, 2), 'utf-8');
+  await pool.query(
+    `INSERT INTO admin_credentials (id, username, password_hash, updated_at)
+     VALUES (1, $1, $2, now())
+     ON CONFLICT (id) DO UPDATE SET username = $1, password_hash = $2, updated_at = now()`,
+    [newUsername || current.username, passwordHash]
+  );
+
   return true;
 }
 

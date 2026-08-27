@@ -1,14 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import { pool, initDb } from './db';
 import { PortfolioData } from '../src/types/portfolio';
-
-const DATA_DIR = path.join(process.cwd(), 'server', 'data');
-const PORTFOLIO_FILE = path.join(DATA_DIR, 'portfolio-content.json');
-
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
 
 export const SEED_PORTFOLIO_DATA: PortfolioData = {
   personalInfo: {
@@ -514,25 +505,32 @@ I build practical, deployable systems spanning full-stack web applications, mach
   }
 };
 
-export function getPortfolioData(): PortfolioData {
-  if (fs.existsSync(PORTFOLIO_FILE)) {
-    try {
-      const data = JSON.parse(fs.readFileSync(PORTFOLIO_FILE, 'utf-8'));
-      return data;
-    } catch (e) {
-      console.error('Error reading portfolio content file, returning seed data:', e);
-      return SEED_PORTFOLIO_DATA;
-    }
+export async function getPortfolioData(): Promise<PortfolioData> {
+  await initDb();
+
+  const result = await pool.query('SELECT data FROM portfolio_content WHERE id = 1');
+  if (result.rows.length > 0) {
+    return result.rows[0].data as PortfolioData;
   }
 
-  // Write seed data if not present
-  fs.writeFileSync(PORTFOLIO_FILE, JSON.stringify(SEED_PORTFOLIO_DATA, null, 2), 'utf-8');
+  // No row yet: seed the database
+  await pool.query(
+    'INSERT INTO portfolio_content (id, data) VALUES (1, $1) ON CONFLICT (id) DO NOTHING',
+    [JSON.stringify(SEED_PORTFOLIO_DATA)]
+  );
   return SEED_PORTFOLIO_DATA;
 }
 
-export function savePortfolioData(data: PortfolioData): boolean {
+export async function savePortfolioData(data: PortfolioData): Promise<boolean> {
+  await initDb();
+
   try {
-    fs.writeFileSync(PORTFOLIO_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    await pool.query(
+      `INSERT INTO portfolio_content (id, data, updated_at)
+       VALUES (1, $1, now())
+       ON CONFLICT (id) DO UPDATE SET data = $1, updated_at = now()`,
+      [JSON.stringify(data)]
+    );
     return true;
   } catch (e) {
     console.error('Error saving portfolio data:', e);
@@ -540,7 +538,14 @@ export function savePortfolioData(data: PortfolioData): boolean {
   }
 }
 
-export function resetPortfolioData(): PortfolioData {
-  fs.writeFileSync(PORTFOLIO_FILE, JSON.stringify(SEED_PORTFOLIO_DATA, null, 2), 'utf-8');
+export async function resetPortfolioData(): Promise<PortfolioData> {
+  await initDb();
+
+  await pool.query(
+    `INSERT INTO portfolio_content (id, data, updated_at)
+     VALUES (1, $1, now())
+     ON CONFLICT (id) DO UPDATE SET data = $1, updated_at = now()`,
+    [JSON.stringify(SEED_PORTFOLIO_DATA)]
+  );
   return SEED_PORTFOLIO_DATA;
 }

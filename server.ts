@@ -25,13 +25,24 @@ import {
   resetPortfolioData
 } from './server/storage';
 
+// Wraps an async route handler so rejected promises are forwarded to the
+// Express error handler instead of hanging the request (Express 4 does not
+// do this automatically).
+function asyncHandler(
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    fn(req, res, next).catch(next);
+  };
+}
+
 async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
 
   // Initialize admin credentials and seed data
-  getAdminCredentials();
-  getPortfolioData();
+  await getAdminCredentials();
+  await getPortfolioData();
 
   app.use(express.json({ limit: '10mb' }));
   app.use(cookieParser());
@@ -62,7 +73,7 @@ async function startServer() {
   });
 
   // Single admin login
-  app.post('/api/auth/login', (req: Request, res: Response) => {
+  app.post('/api/auth/login', asyncHandler(async (req: Request, res: Response) => {
     const ip = getClientIp(req);
     const rateStatus = checkRateLimit(ip);
 
@@ -82,7 +93,7 @@ async function startServer() {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    const admin = getAdminCredentials();
+    const admin = await getAdminCredentials();
 
     // Verify username and bcrypt hashed password
     const isUsernameMatch = username.trim() === admin.username;
@@ -127,7 +138,7 @@ async function startServer() {
         role: 'admin'
       }
     });
-  });
+  }));
 
   // Current auth status check
   app.get('/api/auth/me', (req: Request, res: Response) => {
@@ -161,19 +172,19 @@ async function startServer() {
   });
 
   // Update password (Protected)
-  app.post('/api/admin/change-password', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  app.post('/api/admin/change-password', requireAuth, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { currentPassword, newPassword, newUsername } = req.body;
 
     if (!newPassword || newPassword.length < 8) {
       return res.status(400).json({ error: 'New password must be at least 8 characters long' });
     }
 
-    const admin = getAdminCredentials();
+    const admin = await getAdminCredentials();
     if (currentPassword && !verifyPassword(currentPassword, admin.passwordHash)) {
       return res.status(400).json({ error: 'Current password is incorrect' });
     }
 
-    updateAdminPassword(newPassword, newUsername);
+    await updateAdminPassword(newPassword, newUsername);
 
     // Issue refreshed token
     const refreshedToken = generateToken(newUsername || admin.username);
@@ -189,25 +200,25 @@ async function startServer() {
       message: 'Credentials updated successfully',
       token: refreshedToken
     });
-  });
+  }));
 
   // ==================== PORTFOLIO CONTENT APIS ====================
 
   // Public: Get portfolio content
-  app.get('/api/portfolio', (req: Request, res: Response) => {
-    const data = getPortfolioData();
+  app.get('/api/portfolio', asyncHandler(async (req: Request, res: Response) => {
+    const data = await getPortfolioData();
     res.json(data);
-  });
+  }));
 
   // Protected: Save portfolio content
-  app.put('/api/portfolio', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  app.put('/api/portfolio', requireAuth, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const incomingData = req.body;
 
     if (!incomingData || !incomingData.personalInfo) {
       return res.status(400).json({ error: 'Invalid portfolio data payload' });
     }
 
-    const success = savePortfolioData(incomingData);
+    const success = await savePortfolioData(incomingData);
     if (!success) {
       return res.status(500).json({ error: 'Failed to save portfolio data to storage' });
     }
@@ -217,17 +228,17 @@ async function startServer() {
       message: 'Portfolio content saved successfully',
       data: incomingData
     });
-  });
+  }));
 
   // Protected: Reset portfolio content to seed data
-  app.post('/api/portfolio/reset', requireAuth, (req: AuthenticatedRequest, res: Response) => {
-    const resetData = resetPortfolioData();
+  app.post('/api/portfolio/reset', requireAuth, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const resetData = await resetPortfolioData();
     res.json({
       success: true,
       message: 'Portfolio content reset to default successfully',
       data: resetData
     });
-  });
+  }));
 
   // ==================== VITE SPA & STATIC SERVING ====================
 
