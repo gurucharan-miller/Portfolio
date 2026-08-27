@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="matrixGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#FF6B00" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#FF3B30" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#050505" stop-opacity="0"/>
+    </radialGradient>
+    
+    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8533"/>
+      <stop offset="50%" stop-color="#FF6B00"/>
+      <stop offset="100%" stop-color="#CC4400"/>
+    </linearGradient>
+
+    <linearGradient id="faceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFAA33"/>
+      <stop offset="50%" stop-color="#FF7700"/>
+      <stop offset="100%" stop-color="#DD4400"/>
+    </linearGradient>
+
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Deep Black Background -->
+  <rect width="600" height="800" fill="#050505"/>
+  <rect width="600" height="800" fill="url(#matrixGlow)"/>
+
+  <!-- Matrix Digital Code Streams in Background -->
+  <g font-family="monospace" font-size="13" font-weight="bold" opacity="0.35" fill="#FF5500">
+    <text x="25" y="40">10101100101010110101010010101101010101</text>
+    <text x="25" y="70">01010010110101001010101101001010101101</text>
+    <text x="25" y="100">11010101010101101010010101011010100101</text>
+    <text x="25" y="130">00101011010101001010110101010110101010</text>
+    <text x="25" y="160">10101010101101010010101011010100101011</text>
+    <text x="25" y="190">01011010100101010110100101010110101001</text>
+    <text x="25" y="220">11010101010101101010010101011010100101</text>
+    <text x="25" y="250">01010010110101001010101101001010101101</text>
+    <text x="25" y="280">10101100101010110101010010101101010101</text>
+    <text x="25" y="310">00101011010101001010110101010110101010</text>
+    <text x="25" y="340">11010101010101101010010101011010100101</text>
+    <text x="25" y="370">01011010100101010110100101010110101001</text>
+    <text x="25" y="400">10101010101101010010101011010100101011</text>
+  </g>
+
+  <!-- Glowing Digital Binary Rain Columns -->
+  <g font-family="monospace" font-size="14" font-weight="900" filter="url(#neonGlow)">
+    <!-- Column 1 -->
+    <text x="45" y="60" fill="#FF8800" opacity="0.6">1</text>
+    <text x="45" y="90" fill="#FFAA33" opacity="0.9">0</text>
+    <text x="45" y="120" fill="#FF5500" opacity="0.4">1</text>
+    <text x="45" y="150" fill="#FF6B00" opacity="0.7">1</text>
+    <text x="45" y="180" fill="#FFAA00" opacity="0.95">0</text>
+    <text x="45" y="210" fill="#FF3B30" opacity="0.5">1</text>
+
+    <!-- Column 2 -->
+    <text x="110" y="80" fill="#FFAA33" opacity="0.9">0</text>
+    <text x="110" y="110" fill="#FF8800" opacity="0.7">1</text>
+    <text x="110" y="140" fill="#FF6B00" opacity="0.5">0</text>
+    <text x="110" y="170" fill="#FFAA00" opacity="0.85">1</text>
+    <text x="110" y="200" fill="#FF8800" opacity="0.6">1</text>
+    <text x="110" y="230" fill="#FF3B30" opacity="0.4">0</text>
+
+    <!-- Right Side Columns -->
+    <text x="500" y="70" fill="#FFAA33" opacity="0.95">1</text>
+    <text x="500" y="100" fill="#FF8800" opacity="0.7">0</text>
+    <text x="500" y="130" fill="#FF6B00" opacity="0.4">1</text>
+    <text x="500" y="160" fill="#FFAA00" opacity="0.8">1</text>
+    <text x="500" y="190" fill="#FF3B30" opacity="0.5">0</text>
+
+    <text x="555" y="90" fill="#FF6B00" opacity="0.6">0</text>
+    <text x="555" y="120" fill="#FFAA33" opacity="0.9">1</text>
+    <text x="555" y="150" fill="#FF8800" opacity="0.7">1</text>
+    <text x="555" y="180" fill="#FF3B30" opacity="0.4">0</text>
+  </g>
+
+  <!-- Suit and Shoulders Silhouette - Constructed in dense matrix numbers -->
+  <g font-family="monospace" font-size="11" font-weight="bold" fill="url(#suitGrad)" opacity="0.85">
+    <!-- Left Shoulder & Suit Body -->
+    <path d="M 60 800 L 170 540 L 260 520 L 260 800 Z" opacity="0.15" fill="#FF5500"/>
+    <!-- Right Shoulder & Suit Body -->
+    <path d="M 540 800 L 430 540 L 340 520 L 340 800 Z" opacity="0.15" fill="#FF5500"/>
+
+    <!-- Suit Matrix Digits Lines -->
+    <text x="60" y="580">10101100101010110101010010101101010101010101010101</text>
+    <text x="50" y="600">01010010110101001010101101001010101101010101010101</text>
+    <text x="40" y="620">11010101010101101010010101011010100101010101010101</text>
+    <text x="30" y="640">00101011010101001010110101010110101010101010101010</text>
+    <text x="20" y="660">10101010101101010010101011010100101011010101010101</text>
+    <text x="10" y="680">01011010100101010110100101010110101001010101010101</text>
+    <text x="10" y="700">11010101010101101010010101011010100101010101010101</text>
+    <text x="10" y="720">01010010110101001010101101001010101101010101010101</text>
+    <text x="10" y="740">10101100101010110101001010110101010101010101010101</text>
+    <text x="10" y="760">00101011010101001010110101010110101010101010101010</text>
+    <text x="10" y="780">11010101010101101010010101011010100101010101010101</text>
+  </g>
+
+  <!-- Bright White/Orange Matrix Shirt Collar -->
+  <polygon points="260,520 300,600 230,580" fill="#FFF2E6" opacity="0.8"/>
+  <polygon points="340,520 300,600 370,580" fill="#FFF2E6" opacity="0.8"/>
+
+  <!-- Necktie in Dark Matrix Digits -->
+  <polygon points="288,580 312,580 325,760 300,795 275,760" fill="#0A0A0A"/>
+  <polygon points="288,580 312,580 325,760 300,795 275,760" fill="none" stroke="#FF6B00" stroke-width="1.5" opacity="0.7"/>
+
+  <!-- Head & Hair Silhouette Base -->
+  <path d="M 210 280 C 200 130, 400 130, 390 280 C 400 380, 370 480, 300 500 C 230 480, 200 380, 210 280 Z" fill="#0D0D0D" opacity="0.9"/>
+
+  <!-- High-Density Face Matrix Code Grid -->
+  <g font-family="monospace" font-size="10" font-weight="900" fill="url(#faceGrad)" opacity="0.95" text-anchor="middle" filter="url(#neonGlow)">
+    <!-- Forehead & Textured Hair -->
+    <text x="300" y="150">1010101010101010101</text>
+    <text x="300" y="165">01010101010101010101010</text>
+    <text x="300" y="180">1101010101010101010101011</text>
+    <text x="300" y="195">0010101010101010101010100</text>
+    <text x="300" y="210">101010101010101010101010101</text>
+    <text x="300" y="225">010101010101010101010101010</text>
+    <text x="300" y="240">110101010101010101010101011</text>
+    <text x="300" y="255">010101010101010101010101010</text>
+
+    <!-- Eyes & Brow Level (High Glow) -->
+    <text x="260" y="280" font-size="12" fill="#FFAA33">010101</text>
+    <text x="340" y="280" font-size="12" fill="#FFAA33">101010</text>
+    <text x="300" y="280" fill="#FF7700">1010</text>
+
+    <text x="260" y="300" font-size="13" fill="#FFFFFF">101</text>
+    <text x="340" y="300" font-size="13" fill="#FFFFFF">010</text>
+    <text x="300" y="300" fill="#FF8800">0101</text>
+
+    <!-- Nose Bridge & Cheekbones -->
+    <text x="300" y="320">101010101010101010101</text>
+    <text x="300" y="338">010101010101010101010</text>
+    <text x="300" y="356">110101010101010101011</text>
+    <text x="300" y="374">001010101010101010100</text>
+
+    <!-- Lips & Beard Definition -->
+    <text x="300" y="394" fill="#FFAA00">1010101010101</text>
+    <text x="300" y="412" fill="#FF6B00">0101010101010101</text>
+    <text x="300" y="430" fill="#FF5500">110101010101011</text>
+
+    <!-- Chin & Jawline -->
+    <text x="300" y="450">0101010101010</text>
+    <text x="300" y="470">10101010101</text>
+    <text x="300" y="490">010101010</text>
+  </g>
+
+  <!-- Glowing Cyber Frame Accents -->
+  <rect x="15" y="15" width="570" height="770" fill="none" stroke="#FF6B00" stroke-width="1.5" stroke-opacity="0.3" rx="16"/>
+  <rect x="25" y="25" width="550" height="750" fill="none" stroke="#FF6B00" stroke-width="0.75" stroke-opacity="0.2" rx="12"/>
+  
+  <!-- Corner Targets -->
+  <path d="M 15 45 L 15 15 L 45 15" fill="none" stroke="#FF6B00" stroke-width="3"/>
+  <path d="M 585 45 L 585 15 L 555 15" fill="none" stroke="#FF6B00" stroke-width="3"/>
+  <path d="M 15 755 L 15 785 L 45 785" fill="none" stroke="#FF6B00" stroke-width="3"/>
+  <path d="M 585 755 L 585 785 L 555 785" fill="none" stroke="#FF6B00" stroke-width="3"/>
+
+  <!-- Footer Cyber Label -->
+  <text x="300" y="770" font-family="monospace" font-size="10" fill="#FF6B00" font-weight="bold" letter-spacing="3" text-anchor="middle" opacity="0.8">GURUCHARAN M // CYBERNETIC_DEV</text>
+</svg>
