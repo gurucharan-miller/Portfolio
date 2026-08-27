@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -27,7 +27,7 @@ import {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Initialize admin credentials and seed data
   getAdminCredentials();
@@ -245,9 +245,33 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  // ==================== GLOBAL ERROR HANDLER ====================
+  // Must be registered after all routes/middleware
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error('Unhandled error:', err);
+    res.status(err.status || 500).json({
+      error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
+    });
+  });
+
+  // ==================== SERVER START & GRACEFUL SHUTDOWN ====================
+
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Portfolio server running on port ${PORT}`);
   });
+
+  function shutdown(signal: string) {
+    console.log(`${signal} received. Closing server gracefully...`);
+    server.close(() => {
+      console.log('Server closed. Exiting process.');
+      process.exit(0);
+    });
+    // Force exit if it hangs
+    setTimeout(() => process.exit(1), 10000).unref();
+  }
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
 startServer();

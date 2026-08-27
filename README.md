@@ -1,8 +1,6 @@
 # Portfolio
 
-<div align="center">
-  <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+
 
 A professional, high-performance, single-page application (SPA) portfolio website showcasing the work, skills, and projects of Gurucharan M. This repository features an interactive 3D frontend integrated with a secured Express.js backend administration dashboard.
 
